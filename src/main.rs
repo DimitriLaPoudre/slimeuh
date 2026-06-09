@@ -4,13 +4,18 @@ mod frame;
 mod input;
 mod macros;
 mod particle;
+mod polygon;
+mod slime;
 mod spatial_grid;
 mod tortilla;
 mod vector;
 
+use std::time::Instant;
+
 use core::Core;
 use particle::ParticleSystem;
-use std::time::Instant;
+use polygon::Polygon;
+use slime::Slime;
 use tortilla::Tortilla;
 use vector::Vector2D;
 
@@ -20,30 +25,21 @@ const HEIGHT: usize = 600;
 const REFRESH: usize = 60;
 
 fn main() {
-    let tortilla = Tortilla::new(
-        Vector2D {
-            x: WIDTH,
-            y: HEIGHT,
-        },
-        Vector2D::new(200.0, 300.0),
-        0.5,
-        3.0,
-        10,
-        20.0,
-    );
-    let particle_system = ParticleSystem::new(
-        Vector2D {
-            x: WIDTH,
-            y: HEIGHT,
-        },
-        Vector2D::new(600.0, 300.0),
-        6400,
-        0.5,
+    let slime = Slime::new(
+        Vector2D { x: 400, y: 300 },
+        Vector2D { x: 10, y: 10 },
+        0.1,
+        2.0,
     );
 
+    let polygon = Polygon {
+        points: vec![Vector2D { x: 0.0, y: 0.0 }],
+    };
+
     let mut core = Core::new(TITLE, WIDTH, HEIGHT, REFRESH);
-    core.add_entity(tortilla);
-    core.add_entity(particle_system);
+    // core.add_entity(tortilla);
+    // core.add_entity(particle_system);
+    core.add_entity(slime);
 
     let mut last = Instant::now();
     while core.is_open() {

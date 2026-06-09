@@ -122,3 +122,12 @@ where
         }
     }
 }
+
+impl<T> Vector2D<T>
+where
+    T: Copy + Mul<Output = T> + Add<Output = T>,
+{
+    pub fn dot(&self, other: Vector2D<T>) -> T {
+        self.x * other.x + self.y * other.y
+    }
+}
