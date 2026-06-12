@@ -1,16 +1,17 @@
-use crate::frame::Frame;
-use crate::input::Input;
+pub type Entity = u32;
 
-pub trait Inputable {
-    fn handle_input(&mut self, input: Input);
+pub struct EntityManager {
+    next_id: u32,
 }
 
-pub trait Updatable {
-    fn update(&mut self, dt: f32);
-}
+impl EntityManager {
+    pub fn new() -> Self {
+        Self { next_id: 0 }
+    }
 
-pub trait Drawable {
-    fn draw(&self, frame: &mut Frame);
+    pub fn create_entity(&mut self) -> Entity {
+        let new_id = self.next_id;
+        self.next_id += 1;
+        new_id
+    }
 }
-
-pub trait Entity: Inputable + Updatable + Drawable {}
