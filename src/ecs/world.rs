@@ -1,9 +1,11 @@
 use crate::{
-    component_store::ComponentStore,
-    entity::{Entity, EntityManager},
-    system_store::SystemStore,
+    ecs::{
+        component_store::ComponentStore,
+        entity::{Entity, EntityManager},
+        system_store::SystemStore,
+    },
+    systems::System,
 };
-use anyhow::Result;
 
 pub struct World {
     entity_manager: EntityManager,
@@ -24,8 +26,18 @@ impl World {
         self.entity_manager.create_entity()
     }
 
-    pub fn bind<T: 'static>(&mut self, entity: Entity, component: T) -> Result<()> {
+    pub fn bind<T: 'static>(&mut self, entity: Entity, component: T) {
         self.components.link(entity, component)
+    }
+
+    pub fn add_system(&mut self, system: Box<dyn System>) {
+        self.systems.add(system);
+    }
+
+    pub fn run_systems(&mut self, dt: f32) {
+        for system in self.systems.get_mut() {
+            system.run(&mut self.components, dt);
+        }
     }
 }
 
