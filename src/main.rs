@@ -1,16 +1,12 @@
 mod components;
 mod ecs;
 mod systems;
-
-use std::time::Instant;
+mod types;
 
 use crate::{
     components::{position::Position, render::Render},
     ecs::world::World,
-    systems::{
-        movement::Movement,
-        renderer::{Renderer, RendererConfig},
-    },
+    systems::{movement::Movement, renderer::RendererConfig, rendering::create_rendering},
 };
 
 const TITLE: &str = "slime";
@@ -21,13 +17,16 @@ const REFRESH: usize = 60;
 fn main() {
     let mut world = World::new();
 
-    world.add_system(Box::new(Movement {}));
-    world.add_system(Box::new(Renderer::new(RendererConfig {
+    let (input, renderer) = create_rendering(RendererConfig {
         title: String::from(TITLE),
         width: WIDTH,
         height: HEIGHT,
         refresh: REFRESH,
-    })));
+    });
+
+    world.add_system(Box::new(input));
+    world.add_system(Box::new(Movement {}));
+    world.add_system(Box::new(renderer));
 
     let e = spawn!(
         world,
@@ -37,12 +36,7 @@ fn main() {
         }
     );
 
-    let mut last = Instant::now();
-    loop {
-        let now = Instant::now();
-        let dt = now.duration_since(last).as_secs_f32();
-        last = now;
+    println!("{:#?}", world.data.entity_manager);
 
-        world.run_systems(dt);
-    }
+    world.run();
 }

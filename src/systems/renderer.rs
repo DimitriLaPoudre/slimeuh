@@ -1,8 +1,14 @@
+use std::{cell::RefCell, rc::Rc};
+
 use minifb::{Window, WindowOptions};
 
 use crate::{
-    components::{position::Position, render::Render},
-    ecs::component_store::ComponentStore,
+    components::{
+        Component,
+        position::{self, Position},
+        render::Render,
+    },
+    ecs::world::WorldData,
     rgb,
     systems::System,
 };
@@ -38,7 +44,7 @@ impl Frame {
 
 pub struct Renderer {
     frame: Frame,
-    window: Window,
+    window: Rc<RefCell<Window>>,
     refresh: usize,
 }
 
@@ -56,19 +62,27 @@ impl Renderer {
 
         Self {
             frame: Frame::new(config.width, config.height),
-            window,
+            window: Rc::new(RefCell::new(window)),
             refresh: config.refresh,
         }
+    }
+
+    pub fn get_window(&self) -> Rc<RefCell<Window>> {
+        self.window.clone()
     }
 }
 
 impl System for Renderer {
-    fn run(&mut self, components: &mut ComponentStore, dt: f32) {
+    fn run(&mut self, wd: &mut WorldData, dt: f32) {
         self.frame.fill(rgb!(0, 0, 0));
 
-        for entity in components.query::<(&Render, &Position)>() {
-            let render = components.get_component_mut::<Render>(entity).unwrap();
-            let position = components.get_component_mut::<Position>(entity).unwrap();
+        for e in wd.query::<(Render, Position)>() {
+            let Some(render) = wd.components.render.get(&e) else {
+                continue;
+            };
+            let Some(position) = wd.components.position.get(&e) else {
+                continue;
+            };
 
             let x = position.x as i32;
             let y = position.y as i32;
@@ -80,6 +94,7 @@ impl System for Renderer {
         }
 
         self.window
+            .borrow_mut()
             .update_with_buffer(&self.frame.buffer, self.frame.width, self.frame.height)
             .expect("Failed to update buffer");
     }
