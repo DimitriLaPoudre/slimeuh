@@ -1,12 +1,15 @@
 mod components;
 mod ecs;
+mod prefabs;
 mod systems;
 mod types;
 
 use crate::{
     components::{position::Position, render::Render},
     ecs::world::World,
+    prefabs::slime::{self, slime_spawn},
     systems::{movement::Movement, renderer::RendererConfig, rendering::create_rendering},
+    types::vector2d::Vector2D,
 };
 
 const TITLE: &str = "slime";
@@ -28,15 +31,21 @@ fn main() {
     world.add_system(Box::new(Movement {}));
     world.add_system(Box::new(renderer));
 
-    let e = spawn!(
-        world,
-        Position { x: 10.0, y: 10.0 },
-        Render {
-            color: rgb!(255, 255, 255)
-        }
-    );
+    // let e = spawn!(
+    //     world,
+    //     Position { x: 10.0, y: 10.0 },
+    //     Render {
+    //         color: rgb!(255, 255, 255)
+    //     }
+    // );
 
-    println!("{:#?}", world.data.entity_manager);
+    slime_spawn(
+        &mut world,
+        Vector2D { x: 10, y: 10 },
+        Vector2D { x: 10, y: 10 },
+        0.1,
+        2.0,
+    );
 
     world.run();
 }
