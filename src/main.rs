@@ -8,7 +8,9 @@ use crate::{
     components::{position::Position, render::Render},
     ecs::world::World,
     prefabs::slime::{self, slime_spawn},
-    systems::{movement::Movement, renderer::RendererConfig, rendering::create_rendering},
+    systems::{
+        gravity::Gravity, movement::Movement, renderer::RendererConfig, rendering::create_rendering,
+    },
     types::vector2d::Vector2D,
 };
 
@@ -28,6 +30,7 @@ fn main() {
     });
 
     world.add_system(Box::new(input));
+    world.add_system(Box::new(Gravity {}));
     world.add_system(Box::new(Movement {}));
     world.add_system(Box::new(renderer));
 

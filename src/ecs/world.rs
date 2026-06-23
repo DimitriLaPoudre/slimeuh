@@ -35,39 +35,57 @@ pub trait Query {
     fn iter(wd: &mut WorldData) -> Vec<Entity>;
 }
 
-impl<A: Component> Query for (A) {
-    fn iter(wd: &mut WorldData) -> Vec<Entity> {
-        let mut filtered_entities: Vec<Entity> = vec![];
-        for (key, bitset) in wd.entity_manager.entities.iter() {
-            if bitset & (A::BIT) != 0 {
-                filtered_entities.push(*key);
-            }
-        }
-
-        filtered_entities
-    }
-}
-
-impl<A: Component, B: Component> Query for (A, B) {
-    fn iter(wd: &mut WorldData) -> Vec<Entity> {
-        let mut filtered_entities: Vec<Entity> = vec![];
-        for (key, bitset) in wd.entity_manager.entities.iter() {
-            if bitset & (A::BIT | B::BIT) != 0 {
-                filtered_entities.push(*key);
-            }
-        }
-
-        filtered_entities
-    }
-}
+// impl<A: Component> Query for (A) {
+//     fn iter(wd: &mut WorldData) -> Vec<Entity> {
+//         let mut filtered_entities: Vec<Entity> = vec![];
+//         for (key, bitset) in wd.entity_manager.entities.iter() {
+//             if bitset & (A::BIT) != 0 {
+//                 filtered_entities.push(*key);
+//             }
+//         }
 //
-// impl<A: Component> Iterator for (HashMap<Entity, A>) {
-//     type Item = (Entity, A);
-//
-//     fn next(&mut self) -> Option<Self::Item> {
-//         None
+//         filtered_entities
 //     }
 // }
+//
+// impl<A: Component, B: Component> Query for (A, B) {
+//     fn iter(wd: &mut WorldData) -> Vec<Entity> {
+//         let mut filtered_entities: Vec<Entity> = vec![];
+//         for (key, bitset) in wd.entity_manager.entities.iter() {
+//             if bitset & (A::BIT | B::BIT) != 0 {
+//                 filtered_entities.push(*key);
+//             }
+//         }
+//
+//         filtered_entities
+//     }
+// }
+
+macro_rules! impl_query {
+    ($($component:ident),+) => {
+        impl<$($component: Component),+> Query for ($($component,)+) {
+            fn iter(wd: &mut WorldData) -> Vec<Entity> {
+                let mut filtered_entities = Vec::new();
+
+                let mask = 0 $(| $component::BIT)+;
+
+                for (key, bitset) in wd.entity_manager.entities.iter() {
+                    if bitset & mask != 0 {
+                        filtered_entities.push(*key);
+                    }
+                }
+
+                filtered_entities
+            }
+        }
+    };
+}
+
+impl_query!(A);
+impl_query!(A, B);
+impl_query!(A, B, C);
+impl_query!(A, B, C, D);
+impl_query!(A, B, C, D, E);
 
 pub struct World {
     pub data: WorldData,

@@ -1,3 +1,7 @@
+use crate::components::force::Force;
+use crate::components::mass::Mass;
+use crate::components::velocity::Velocity;
+use crate::ecs::entity_manager::Entity;
 use crate::rgb;
 use crate::{
     components::{position::Position, render::Render},
@@ -15,9 +19,10 @@ pub fn slime_spawn(
 ) {
     // let mut cells: Vec<Rc<RefCell<SlimeCell>>> = Vec::new();
     // let mut links: Vec<SlimeLink> = Vec::new();
+    let mut entities: Vec<Entity> = vec![];
     for offset_y in 0..size.y {
         for offset_x in 0..size.x {
-            spawn!(
+            let e = spawn!(
                 w,
                 Position {
                     x: pos.x as f32 + offset_x as f32 * cell_space,
@@ -25,7 +30,10 @@ pub fn slime_spawn(
                 },
                 Render {
                     color: rgb!(0, 255, 0)
-                }
+                },
+                Mass { m: 1.0 },
+                Velocity { x: 0.0, y: 0.0 },
+                Force { x: 0.0, y: 0.0 }
             );
             // if offset_x != 0 {
             //     let other_cell = &cells[(offset_x - 1) + offset_y * size.x];
@@ -70,7 +78,7 @@ pub fn slime_spawn(
             //     }
             // }
 
-            // cells.push(new_cell);
+            entities.push(e);
         }
     }
 }
