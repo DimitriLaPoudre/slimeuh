@@ -6,7 +6,7 @@ use crate::{
     components::{
         Component,
         position::{self, Position},
-        render::Render,
+        render::{Render, RenderForm},
     },
     ecs::world::WorldData,
     rgb,
@@ -70,6 +70,14 @@ impl Renderer {
     pub fn get_window(&self) -> Rc<RefCell<Window>> {
         self.window.clone()
     }
+
+    fn put_pixel(&mut self, x: i32, y: i32, color: u32) {
+        let width = self.frame.width as i32;
+        let height = self.frame.height as i32;
+        if x >= 0 && y >= 0 && x < width && y < height {
+            self.frame.buffer[(y * width + x) as usize] = color;
+        }
+    }
 }
 
 impl System for Renderer {
@@ -84,12 +92,22 @@ impl System for Renderer {
                 continue;
             };
 
-            let x = position.x as i32;
-            let y = position.y as i32;
-            let width = self.frame.width as i32;
-            let height = self.frame.height as i32;
-            if x >= 0 && y >= 0 && x < width && y < height {
-                self.frame.buffer[(y * width + x) as usize] = render.color;
+            match render.form {
+                RenderForm::Circle(radius) => {
+                    let radius = radius as i32;
+                    for y in -radius..=radius {
+                        let dx = ((radius * radius - y * y) as f32).sqrt() as i32;
+
+                        for x in -dx..=dx {
+                            self.put_pixel(
+                                position.x as i32 + x,
+                                position.y as i32 + y,
+                                render.color,
+                            );
+                        }
+                    }
+                }
+                _ => {}
             }
         }
 

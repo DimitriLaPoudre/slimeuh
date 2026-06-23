@@ -5,6 +5,7 @@ use crate::ecs::{
     entity_manager::{Entity, EntityManager},
 };
 
+pub mod collider;
 pub mod force;
 pub mod mass;
 pub mod position;

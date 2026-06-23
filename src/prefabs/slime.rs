@@ -1,5 +1,7 @@
+use crate::components::collider::{Collider, ColliderForm};
 use crate::components::force::Force;
 use crate::components::mass::Mass;
+use crate::components::render::RenderForm;
 use crate::components::velocity::Velocity;
 use crate::ecs::entity_manager::Entity;
 use crate::rgb;
@@ -17,8 +19,6 @@ pub fn slime_spawn(
     cell_size: f32,
     cell_space: f32,
 ) {
-    // let mut cells: Vec<Rc<RefCell<SlimeCell>>> = Vec::new();
-    // let mut links: Vec<SlimeLink> = Vec::new();
     let mut entities: Vec<Entity> = vec![];
     for offset_y in 0..size.y {
         for offset_x in 0..size.x {
@@ -29,11 +29,15 @@ pub fn slime_spawn(
                     y: pos.y as f32 + offset_y as f32 * cell_space,
                 },
                 Render {
-                    color: rgb!(0, 255, 0)
+                    color: rgb!(0, 255, 0),
+                    form: RenderForm::Circle(0.5)
                 },
                 Mass { m: 1.0 },
                 Velocity { x: 0.0, y: 0.0 },
-                Force { x: 0.0, y: 0.0 }
+                Force { x: 0.0, y: 0.0 },
+                Collider {
+                    form: ColliderForm::Circle(0.5)
+                }
             );
             // if offset_x != 0 {
             //     let other_cell = &cells[(offset_x - 1) + offset_y * size.x];

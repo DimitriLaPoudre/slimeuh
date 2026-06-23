@@ -5,7 +5,14 @@ mod systems;
 mod types;
 
 use crate::{
-    components::{position::Position, render::Render},
+    components::{
+        collider::{Collider, ColliderForm},
+        force::Force,
+        mass::Mass,
+        position::Position,
+        render::{Render, RenderForm},
+        velocity::Velocity,
+    },
     ecs::world::World,
     prefabs::slime::{self, slime_spawn},
     systems::{
@@ -34,20 +41,41 @@ fn main() {
     world.add_system(Box::new(Movement {}));
     world.add_system(Box::new(renderer));
 
-    // let e = spawn!(
-    //     world,
-    //     Position { x: 10.0, y: 10.0 },
-    //     Render {
-    //         color: rgb!(255, 255, 255)
-    //     }
+    // slime_spawn(
+    //     &mut world,
+    //     Vector2D { x: 10, y: 10 },
+    //     Vector2D { x: 10, y: 10 },
+    //     0.1,
+    //     2.0,
     // );
+    spawn!(
+        world,
+        Position { x: 10.0, y: 10.0 },
+        Render {
+            color: rgb!(0, 255, 0),
+            form: RenderForm::Circle(10.0)
+        },
+        Mass { m: 1.0 },
+        Velocity { x: 0.0, y: 0.0 },
+        Force { x: 0.0, y: 0.0 },
+        Collider {
+            form: ColliderForm::Circle(10.0)
+        }
+    );
 
-    slime_spawn(
-        &mut world,
-        Vector2D { x: 10, y: 10 },
-        Vector2D { x: 10, y: 10 },
-        0.1,
-        2.0,
+    spawn!(
+        world,
+        Position { x: 50.0, y: 10.0 },
+        Render {
+            color: rgb!(0, 255, 0),
+            form: RenderForm::Circle(10.0)
+        },
+        Mass { m: 1.0 },
+        Velocity { x: 0.0, y: 0.0 },
+        Force { x: 0.0, y: 0.0 },
+        Collider {
+            form: ColliderForm::Circle(10.0)
+        }
     );
 
     world.run();

@@ -30,11 +30,16 @@ impl System for Movement {
                 continue;
             };
 
-            velocity.x += force.x * dt / mass.m;
-            velocity.y += force.y * dt / mass.m;
+            velocity.x += (force.x / mass.m) * dt;
+            velocity.y += (force.y / mass.m) * dt;
 
-            position.x += velocity.x * dt;
-            position.y += velocity.y * dt;
+            if e % 2 == 1 {
+                position.x += velocity.x * dt;
+                position.y += velocity.y * dt;
+            } else {
+                position.x -= velocity.x * dt;
+                position.y -= velocity.y * dt;
+            }
 
             force.x = 0.0;
             force.y = 0.0;

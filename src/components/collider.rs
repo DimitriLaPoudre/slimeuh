@@ -6,30 +6,21 @@ use crate::{
     types::vector2d::Vector2D,
 };
 
-pub enum RenderForm {
+pub enum ColliderForm {
     Circle(f32),
 }
 
-pub struct Render {
-    pub color: u32,
-    pub form: RenderForm,
+pub struct Collider {
+    pub form: ColliderForm,
 }
 
-#[macro_export]
-macro_rules! rgb {
-    ($r:expr, $g:expr, $b:expr) => {
-        ($r << 16) | ($g << 8) | $b
-    };
-}
-
-impl Component for Render {
-    const BIT: u64 = 1 << 3;
-
+impl Component for Collider {
+    const BIT: u64 = 1 << 5;
     fn add_to_store(self, e: Entity, cs: &mut ComponentStore) {
-        cs.render.insert(e, self);
+        cs.collider.insert(e, self);
     }
 
     fn store(cs: &mut ComponentStore) -> &mut HashMap<Entity, Self> {
-        &mut cs.render
+        &mut cs.collider
     }
 }
